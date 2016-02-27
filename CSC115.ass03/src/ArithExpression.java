@@ -137,8 +137,8 @@ public class ArithExpression {
 
 				stack.pop(); //pop off '('
 			} else {
-				while (!stack.isEmpty() && !stack.peek().equals("(") && 
-						(isHigherPresedence(stack.peek().charAt(0), token.charAt(0)) || 
+				while (!stack.isEmpty() && !stack.peek().equals("(") &&
+						(isHigherPresedence(stack.peek(), token) || 
 						stack.peek().equals(token))){
 
 					postfixTokens.append(stack.pop());
@@ -151,25 +151,24 @@ public class ArithExpression {
 		while(!stack.isEmpty()){
 			postfixTokens.append(stack.pop());
 		}
-
 	}
 	
-	public static boolean isHigherPresedence(char higher, char lower){
-		char[] ops = {'-', '+', '/', '*', '^', '(', ')'};
+	public static boolean isHigherPresedence(String higher, String lower){
+		String[] ops = {"-", "+", "/", "*", "^", "(", ")"};
 		int higherInt = -1;
 		int lowerInt = -1;
 		
 		
-		for(int index=0; index<ops.length && higherInt<0 && lowerInt<0; index++){
-			if(higher == ops[index]){
+		for(int index=0; index<ops.length; index++){
+			if(higher.equals(ops[index])){
 				higherInt = index;
 			}
-			if(lower == ops[index]){
+			if(lower.equals(ops[index])){
 				lowerInt = index;
 			}
 		}
 		
-		if(higher > lower){
+		if(higherInt > lowerInt){
 			return true;
 		}
 		
@@ -193,17 +192,17 @@ public class ArithExpression {
 			if(!isOperator(token)){
 				construction.push(token);
 			} else {
-				int int1 = Integer.parseInt(construction.pop());
-				int int2 = Integer.parseInt(construction.pop());
+				double num2 = Double.parseDouble(construction.pop());
+				double num1 = Double.parseDouble(construction.pop());
 				
 				if(token.equals("-")){
-					construction.push(Integer.toString(int1 - int2));
+					construction.push(Double.toString(num1 - num2));
 				} else if(token.equals("+")){
-					construction.push(Integer.toString(int1 + int2));
+					construction.push(Double.toString(num1 + num2));
 				} else if(token.equals("/")){
-					construction.push(Integer.toString(int1 / int2));
+					construction.push(Double.toString(num1 / num2));
 				} else if(token.equals("*")){
-					construction.push(Integer.toString(int1 * int2));
+					construction.push(Double.toString(num1 * num2));
 				}
 			}
 		}
@@ -212,10 +211,22 @@ public class ArithExpression {
 	}
 						
 	public static void main(String[] args) {
-		ArithExpression a = new ArithExpression("(3+2)*2"); //should be... %#$@!!
-		System.out.println(a.getPostfixExpression());
-		System.out.println(a.evaluate());
+		System.out.println(isHigherPresedence("*", "-"));
+		System.out.println(isHigherPresedence("/", "+"));
+		System.out.println(isHigherPresedence("(", "("));
+		System.out.println(isHigherPresedence("*", "-"));
 		
+		String[] infixes = {"(3+2)*2", "1+2*3/2", "(5*2+5*2)/2"};
+		
+		for(int index=0; index<infixes.length; index++){
+			String infix = infixes[index];
+			
+			System.out.println("Infix Expression:  " + infix);
+			ArithExpression a = new ArithExpression(infix); //should be... %#$@!!
+			System.out.println("Postfix Expression:  " + a.getPostfixExpression());
+			System.out.println("Solution:  " + a.evaluate());
+			System.out.println();
+		}
 	}
 	
 	private static String getString(TokenList tokenList){
