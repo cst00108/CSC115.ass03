@@ -26,10 +26,18 @@ public class StringStack {
 		String toReturn = (String)head.get();
 		head = head.remove();
 		
+		if(toReturn == null){
+			throw new StackEmptyException("Nothing to pop.");
+		}
+		
 		return toReturn;
 	}
 
 	public String peek() {
+		if(head == null){
+			throw new StackEmptyException("Nothing to peek.");
+		}
+
 		return (String)head.get();
 	}
 

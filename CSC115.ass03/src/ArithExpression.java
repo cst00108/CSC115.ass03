@@ -28,7 +28,7 @@ public class ArithExpression {
 	 * @throws InvalidExpressionException if the expression cannot be properly parsed,
 	 *  	or converted to a postfix expression.
 	 */
-	public ArithExpression(String word) {
+	public ArithExpression(String word){
 		if (Tools.isBalancedBy("()",word)) {
 			tokenizeInfix(word);
 			infixToPostfix();
@@ -48,7 +48,9 @@ public class ArithExpression {
 	 * an operator, a paren or a operand.
 	 * @param express The string that is assumed to be an arithmetic expression.
 	 */
-	private void tokenizeInfix(String express) {
+	private void tokenizeInfix(String express){
+		invalidExpressionChecker(express);
+		
 		infixTokens  = new TokenList(express.length());
 
 		// regular expression that looks for any operators or parentheses.
@@ -153,7 +155,32 @@ public class ArithExpression {
 		}
 	}
 	
-	public static boolean isHigherPresedence(String higher, String lower){
+	private static void invalidExpressionChecker(String infix){
+		String valid = "-+/*()0123456789.";
+		boolean checksOut = false;		
+
+		if(infix == null){
+			throw new InvalidExpressionException("Infix expression is null.");
+		}
+		
+		
+		for(int infixIndex=0; infixIndex<infix.length(); infixIndex++){
+			for(int validIndex=0; validIndex<valid.length(); validIndex++){
+				if(infix.charAt(infixIndex) == valid.charAt(validIndex)){
+					checksOut = true;
+					break;
+				}
+			}
+			
+			if(!checksOut){
+				throw new InvalidExpressionException("Invalid infix expression");
+			}
+			
+			checksOut = false;  //set checker for next character
+		}
+	}
+	
+	private static boolean isHigherPresedence(String higher, String lower){
 		String[] ops = {"-", "+", "/", "*", "^", "(", ")"};
 		int higherInt = -1;
 		int lowerInt = -1;
@@ -216,15 +243,24 @@ public class ArithExpression {
 		System.out.println(isHigherPresedence("(", "("));
 		System.out.println(isHigherPresedence("*", "-"));
 		
-		String[] infixes = {"(3+2)*2", "1+2*3/2", "(5*2+5*2)/2"};
+		String[] infixes = {
+			"(3+2)*2", "1+2*3/2", "(5*2+5*2)/2", "Ed", "77777", 
+			"25+25", "3/5", "7.2+2.7", "123.123+321.321", ")8("
+		};
 		
 		for(int index=0; index<infixes.length; index++){
 			String infix = infixes[index];
 			
 			System.out.println("Infix Expression:  " + infix);
-			ArithExpression a = new ArithExpression(infix); //should be... %#$@!!
-			System.out.println("Postfix Expression:  " + a.getPostfixExpression());
-			System.out.println("Solution:  " + a.evaluate());
+			ArithExpression a;
+			
+			try{
+				a = new ArithExpression(infix);
+				System.out.println("Postfix Expression:  " + a.getPostfixExpression());
+				System.out.println("Solution:  " + a.evaluate());
+			} catch(InvalidExpressionException x){
+				System.err.println("not going to fly:  " + x.getMessage());
+			}
 			System.out.println();
 		}
 	}
